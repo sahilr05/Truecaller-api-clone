@@ -54,21 +54,29 @@ class CreateAccount(APIView):
 class ViewSpams(APIView):
     permission_classes = (IsAuthenticated,)
     
+    def get(self, request):
+        SpamNumbers = Contact.objects.filter(is_spam=True)
+        serializer = ContactSerializer(SpamNumbers, many=True)
+        return Response(serializer.data)
+
     @csrf_exempt
     def put(self, request):
+        contact_serializer=None
+        profile_serializer=None
+
         phone = request.data['phone']
         if (phone,) in Contact.objects.values_list('phone'):
-            get_number_from_contacts = get_object_or_404(Contact, phone=phone)
+            get_number_from_contacts = Contact.objects.get(phone=phone)
             contact_serializer = ContactSerializer(get_number_from_contacts, data={'is_spam':True}, partial=True)
-        if (phone,) in Contact.objects.values_list('phone'):
-            get_number_from_profile = get_object_or_404(Profile, phone=phone)
+        if (phone,) in Profile.objects.values_list('phone'):
+            get_number_from_profile = Profile.objects.get(phone=phone)
             profile_serializer = ProfileSerializer(get_number_from_profile, data={'is_spam':True}, partial=True)
 
-        if contact_serializer.is_valid():
+        if contact_serializer and contact_serializer.is_valid():
             contact_serializer.save()
-        if  profile_serializer.is_valid():
+        if  profile_serializer and profile_serializer.is_valid():
             profile_serializer.save()
-            
+
         return Response({"200": "OK"}, status=status.HTTP_200_OK)
     
 
