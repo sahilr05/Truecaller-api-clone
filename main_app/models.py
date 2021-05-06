@@ -9,11 +9,10 @@ class Profile(models.Model):
         regex=r"^\+?1?\d{9,15}$",
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     phone = models.CharField(
         validators=[phone_regex], max_length=15, blank=False, unique=True
     )
-
     # contacts = models.ForeignKey(User, null=True, related_name='user_contacts', on_delete=models.CASCADE)
     is_spam = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -23,11 +22,30 @@ class Profile(models.Model):
         return f"{self.phone}"
 
 class Contact(models.Model):
-    contact_name = models.CharField(max_length=100)
-    profile = models.ManyToManyField(Profile, related_name="user_contacts")
+    name = models.CharField(max_length=100)
+    phone_regex = RegexValidator(
+        regex=r"^\+?1?\d{9,15}$",
+        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",
+    )
+    phone = models.CharField(
+        validators=[phone_regex], max_length=15, blank=False, unique=True
+    )
+    is_spam = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.contact_name}"
+        return f"{self.name}"
+class Mapper(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    contact = models.ForeignKey(Contact, on_delete=models.CASCADE, related_name='user_contacts')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}"
+    
 
 # @receiver(post_save, sender=User)
 # def create_user_profile(sender, instance, created, **kwargs):
