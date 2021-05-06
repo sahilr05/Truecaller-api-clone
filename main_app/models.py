@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
+from django.db.models.fields import EmailField
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -11,7 +12,7 @@ class Profile(models.Model):
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     phone = models.CharField(
-        validators=[phone_regex], max_length=15, blank=False, unique=True
+        validators=[phone_regex], max_length=15, blank  =False, unique=True
     )
     # contacts = models.ForeignKey(User, null=True, related_name='user_contacts', on_delete=models.CASCADE)
     is_spam = models.BooleanField(default=False)
@@ -23,6 +24,7 @@ class Profile(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=100)
+    email = models.EmailField(max_length = 254)
     phone_regex = RegexValidator(
         regex=r"^\+?1?\d{9,15}$",
         message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.",

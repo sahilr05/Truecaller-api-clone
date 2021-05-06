@@ -4,8 +4,8 @@ from django.shortcuts import render, resolve_url
 from django.contrib.auth.models import User
 from .models import Contact, Profile
 from django.http import JsonResponse
-from .serializers import CreateAccountSerializer, AddPhoneSerializer
-from rest_framework import viewsets
+from .serializers import *
+from rest_framework import serializers, viewsets
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -16,12 +16,21 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 
 
-class ViewUsers(APIView):
-    permission_classes = (IsAuthenticated,)
+class ViewContacts(APIView):
+    
     def get(self, request):
-        queryset = User.objects.values("id")
-        return Response(queryset)
+        queryset = Contact.objects.all()
+        serializer = ContactSerializer(queryset, many=True)
+        return Response(serializer.data)
 
+    permission_classes = (IsAuthenticated,)
+
+    @csrf_exempt
+    def post(self, request):
+        data = request.data
+        new_contact = Contact.objects.create(name=data['name'], phone=data['phone'])
+        Mapper.objects.create(user = request.user, contact = new_contact)
+        return Response({"200": "OK"}, status=status.HTTP_200_OK)
 class CreateAccount(APIView):
     @csrf_exempt
     def post(self, request):
