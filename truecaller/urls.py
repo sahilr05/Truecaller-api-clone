@@ -6,9 +6,9 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('view_users', views.ViewUsers.as_view(), name="view_users"),
+    path('contacts', views.ViewContacts.as_view(), name="view_contacts"),
     path('create_account', views.CreateAccount.as_view(), name="create_account"),
-    path('mark_spam', views.MarkSpam.as_view(), name="mark_spam"),
-    path('contacts', views.Contacts.as_view(), name="contact"),
+    # path('mark_spam', views.MarkSpam.as_view(), name="mark_spam"),
+    # path('contacts', views.Contacts.as_view(), name="contact"),
     path('api-token-auth', obtain_auth_token, name='api_token_auth'),
 ]

@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = Contact
         fields = '__all__'
 
 class MapperSerializer(serializers.ModelSerializer):
