@@ -9,6 +9,6 @@ urlpatterns = [
     path('contacts', views.ViewContacts.as_view(), name="view_contacts"),
     path('create_account', views.CreateAccount.as_view(), name="create_account"),
     path('view_spam', views.ViewSpams.as_view(), name="view_spam"),
-    # path('contacts', views.Contacts.as_view(), name="contact"),
+    path('search_contact', views.SearchContact.as_view(), name="search_contact"),
     path('login', obtain_auth_token, name='api_token_auth'),
 ]

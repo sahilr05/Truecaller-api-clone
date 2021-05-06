@@ -79,6 +79,38 @@ class ViewSpams(APIView):
 
         return Response({"200": "OK"}, status=status.HTTP_200_OK)
     
+class SearchContact(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    def get(self, request):
+        response = []
+
+        try:
+            search_name = request.GET['name']       
+            in_contacts = Contact.objects.filter(name=search_name)
+
+            for contact in in_contacts:
+                response.append(ContactSerializer(contact).data)
+
+            not_in_contacts = Contact.objects.all().exclude(name=search_name)
+
+            for contact in not_in_contacts:
+                response.append(ContactSerializer(contact).data)
+
+        except Exception as e:
+            search_phone = request.GET['phone']       
+            in_contacts = Contact.objects.filter(phone=search_phone)
+
+            for contact in in_contacts:
+                response.append(ContactSerializer(contact).data)
+
+            not_in_contacts = Contact.objects.all().exclude(phone=search_phone)
+
+            for contact in not_in_contacts:
+                response.append(ContactSerializer(contact).data)
+
+        return Response(response)
+
 
 # class MarkSpam(APIView):
 #     permission_classes = (IsAuthenticated,)
