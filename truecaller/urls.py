@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('contacts', views.ViewContacts.as_view(), name="view_contacts"),
     path('create_account', views.CreateAccount.as_view(), name="create_account"),
-    # path('mark_spam', views.MarkSpam.as_view(), name="mark_spam"),
+    path('view_spam', views.ViewSpams.as_view(), name="view_spam"),
     # path('contacts', views.Contacts.as_view(), name="contact"),
-    path('api-token-auth', obtain_auth_token, name='api_token_auth'),
+    path('login', obtain_auth_token, name='api_token_auth'),
 ]

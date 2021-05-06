@@ -16,7 +16,6 @@ from django.shortcuts import get_object_or_404
 
 
 class ViewContacts(APIView):
-    
     def get(self, request):
         queryset = Contact.objects.all()
         serializer = ContactSerializer(queryset, many=True)
@@ -51,6 +50,27 @@ class CreateAccount(APIView):
 
         return JsonResponse({"phone": str(Profile.objects.last().phone), \
                             'user': str(User.objects.last().username)})
+
+class ViewSpams(APIView):
+    permission_classes = (IsAuthenticated,)
+    
+    @csrf_exempt
+    def put(self, request):
+        phone = request.data['phone']
+        if (phone,) in Contact.objects.values_list('phone'):
+            get_number_from_contacts = get_object_or_404(Contact, phone=phone)
+            contact_serializer = ContactSerializer(get_number_from_contacts, data={'is_spam':True}, partial=True)
+        if (phone,) in Contact.objects.values_list('phone'):
+            get_number_from_profile = get_object_or_404(Profile, phone=phone)
+            profile_serializer = ProfileSerializer(get_number_from_profile, data={'is_spam':True}, partial=True)
+
+        if contact_serializer.is_valid():
+            contact_serializer.save()
+        if  profile_serializer.is_valid():
+            profile_serializer.save()
+            
+        return Response({"200": "OK"}, status=status.HTTP_200_OK)
+    
 
 # class MarkSpam(APIView):
 #     permission_classes = (IsAuthenticated,)
