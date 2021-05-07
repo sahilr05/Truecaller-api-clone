@@ -17,7 +17,7 @@ from django.shortcuts import get_object_or_404
 
 class ViewContacts(APIView):
     def get(self, request):
-        queryset = Contact.objects.all()
+        queryset = Contact.objects.all().order_by('name')
         serializer = ContactSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -85,7 +85,9 @@ class SearchContact(APIView):
     def get(self, request):
         response = []
 
-        try:
+        param = request.GET.get('name') or request.GET.get('phone')
+
+        if param and param.isalpha():
             search_name = request.GET['name']       
             in_contacts = Contact.objects.filter(name=search_name)
 
@@ -97,18 +99,23 @@ class SearchContact(APIView):
             for contact in not_in_contacts:
                 response.append(ContactSerializer(contact).data)
 
-        except Exception as e:
+        elif param and param.isdigit():
             search_phone = request.GET['phone']       
-            in_contacts = Contact.objects.filter(phone=search_phone, email__isnull=False)
+            in_contacts = Contact.objects.filter(phone=search_phone).exclude(email__exact='')
 
             if in_contacts:
-                for contact in in_contacts:
-                    response.append(ContactSerializer(contact).data)
+                response.append(ContactSerializer(in_contacts.first()).data)
                 return Response(response)
+                # for contact in in_contacts:
+                #     response.append(ContactSerializer(contact).data)
 
             not_in_contacts = Contact.objects.filter(phone=search_phone)
             for contact in not_in_contacts:
                 response.append(ContactSerializer(contact).data)
+        else:
+            queryset = Contact.objects.all().order_by('name')
+            serializer = ContactSerializer(queryset, many=True)
+            return Response(serializer.data)
 
         return Response(response)
 
