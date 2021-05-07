@@ -38,11 +38,15 @@ class CreateAccount(APIView):
         if (data['username'],) in User.objects.values_list('username'):
             return Response({"409": "Conflict", "duplicate error":"user already exists"}, status=status.HTTP_409_CONFLICT)
             
+        if (data['phone'],) in Profile.objects.values_list('phone'):
+            return Response({"409": "Conflict", "duplicate error":"number already exists"}, status=status.HTTP_409_CONFLICT)
+        
         AccountSerializer = UserSerializer(data= \
                             {'username':data['username'], \
                             'email':data['email'], \
                             'password': data['password']}
                         )
+                        
         if AccountSerializer.is_valid():
             AccountSerializer.save()
 
