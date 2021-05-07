@@ -112,38 +112,28 @@ class SearchContact(APIView):
         param = request.GET.get("name") or request.GET.get("phone")
 
         if param and param.isalpha():
-            try:
-                search_name = request.GET["name"]
 
-                contact_prefix = Contact.objects.filter(name__startswith=search_name)
-                if contact_prefix:
-                    for contact in contact_prefix:
-                        response.append(ContactSerializer(contact).data)
+            search_name = request.GET["name"]
 
-                profile_user_prefix = User.objects.filter(
-                    username__startswith=search_name
+            contact_prefix = Contact.objects.filter(name__startswith=search_name)
+            if contact_prefix:
+                for contact in contact_prefix:
+                    response.append(ContactSerializer(contact).data)
+
+            profile_user_prefix = User.objects.filter(username__startswith=search_name)
+            if profile_user_prefix:
+                profile_prefix = [
+                    Profile.objects.filter(user=profile_user)
+                    for profile_user in profile_user_prefix
+                ]
+                for profile in profile_prefix:
+                    response.append(ProfileSerializer(profile.first()).data)
+
+            if response:
+                not_in_contacts = Contact.objects.all().exclude(
+                    name__startswith=search_name
                 )
-                if profile_user_prefix:
-                    profile_prefix = [
-                        Profile.objects.filter(user=profile_user)
-                        for profile_user in profile_user_prefix
-                    ]
-                    for profile in profile_prefix:
-                        response.append(ProfileSerializer(profile.first()).data)
-
-                in_contacts = Contact.objects.filter(name=search_name)
-                if in_contacts:
-                    for contact in in_contacts:
-                        response.append(ContactSerializer(contact).data)
-
-                profile_user = User.objects.get(username=search_name)
-                if profile_user:
-                    in_profile = Profile.objects.filter(user=profile_user)
-                    for contact in in_profile:
-                        response.append(ProfileSerializer(contact).data)
-
-                not_in_contacts = Contact.objects.all().exclude(name=search_name)
-                profiles = User.objects.all().exclude(username=search_name)
+                profiles = User.objects.all().exclude(username__startswith=search_name)
                 not_in_profile = [
                     Profile.objects.filter(user=profile_user)
                     for profile_user in profiles
@@ -153,10 +143,34 @@ class SearchContact(APIView):
                     response.append(ContactSerializer(contact).data)
                 for contact in not_in_profile:
                     if contact:
-                        response.append(ProfileSerializer(contact).data)
-            except Exception as e:
-                print(e)
-                return Response({"404": "Not Found"}, status=status.HTTP_404_NOT_FOUND)
+                        response.append(ProfileSerializer(contact.first()).data)
+
+                return Response(response)
+
+            in_contacts = Contact.objects.filter(name=search_name)
+            if in_contacts:
+                for contact in in_contacts:
+                    response.append(ContactSerializer(contact).data)
+
+            profile_user = User.objects.filter(username=search_name)
+            if profile_user:
+                in_profile = Profile.objects.filter(user=profile_user.first())
+                for contact in in_profile:
+                    response.append(ProfileSerializer(contact.first()).data)
+
+            not_in_contacts = Contact.objects.all().exclude(name=search_name)
+            profiles = User.objects.all().exclude(username=search_name)
+            not_in_profile = [
+                Profile.objects.filter(user=profile_user) for profile_user in profiles
+            ]
+
+            for contact in not_in_contacts:
+                response.append(ContactSerializer(contact).data)
+            for contact in not_in_profile:
+                if contact:
+                    response.append(ProfileSerializer(contact.first()).data)
+
+            return Response(response)
 
         elif param and param.isdigit():
             search_phone = request.GET["phone"]
