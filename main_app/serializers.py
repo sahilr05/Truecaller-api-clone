@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ContactSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contact
-        fields = '__all__'
+        fields = ('name','email','phone','is_spam')
 
 class MapperSerializer(serializers.ModelSerializer):
     class Meta:
