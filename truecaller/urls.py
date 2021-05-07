@@ -20,15 +20,21 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # view all contacts
     path("contacts", views.ViewContacts.as_view(), name="view_contacts"),
+    # create account
     path(
         "create_account", views.CreateAccount.as_view(), name="create_account"
     ),  # noqa
+    # view all spam numbers
     path("view_spam", views.ViewSpams.as_view(), name="view_spam"),  # noqa
+    # search contact
     path(
         "search_contact", views.SearchContact.as_view(), name="search_contact"
     ),  # noqa
+    # login via passing username and password
     path("login", obtain_auth_token, name="api_token_auth"),
+    # swagger ui
     path(
         "swagger-ui/",
         schema_view.with_ui("swagger", cache_timeout=0),
