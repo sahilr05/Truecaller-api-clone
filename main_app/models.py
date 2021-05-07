@@ -18,7 +18,7 @@ class Profile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.phone}"
+        return f"{self.user.username}"
 
 
 class Contact(models.Model):

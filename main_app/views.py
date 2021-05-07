@@ -125,16 +125,14 @@ class SearchContact(APIView):
 
         elif param and param.isdigit():
             search_phone = request.GET["phone"]
-            in_contacts = Contact.objects.filter(phone=search_phone).exclude(
-                email__exact=""
-            )
+            registered_user = Profile.objects.filter(phone=search_phone)
 
-            if in_contacts:
-                response.append(ContactSerializer(in_contacts.first()).data)
+            if registered_user:
+                response.append(ProfileSerializer(registered_user.first()).data)
                 return Response(response)
 
-            not_in_contacts = Contact.objects.filter(phone=search_phone)
-            for contact in not_in_contacts:
+            unregistered_user = Contact.objects.filter(phone=search_phone)
+            for contact in unregistered_user:
                 response.append(ContactSerializer(contact).data)
         else:
             queryset = Contact.objects.all().order_by("name")
