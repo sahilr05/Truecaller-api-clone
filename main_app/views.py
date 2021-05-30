@@ -134,7 +134,7 @@ class SearchContact(APIView):
 
         param = request.GET.get("name") or request.GET.get("phone")
 
-        # if search query contains name then goes into the following function
+        # if search query contains name then goes into the following block
         if param and param.isalpha():
 
             search_name = request.GET["name"]

@@ -109,24 +109,10 @@ WSGI_APPLICATION = "truecaller.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": get_env_variable_or_default(
-            "SQL_ENGINE", "django.db.backends.postgresql"
-        ),
-        "NAME": get_env_variable_or_default("SQL_DATABASE", "truecaller"),
-        "USER": get_env_variable_or_default("SQL_USER", "postgres"),
-        "PASSWORD": get_env_variable_or_default("SQL_PASSWORD", "postgres"),
-        "HOST": get_env_variable_or_default("SQL_HOST", "localhost"),
-        "PORT": get_env_variable_or_default("SQL_PORT", 5432),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
-
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 
 AUTH_PASSWORD_VALIDATORS = [
